@@ -3,17 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>트릭컬 도구</title>
-    <link rel="stylesheet" href="style.css">
+    <title>트릭컬 실시간 채팅</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        #messages { border: 1px solid #ddd; padding: 10px; max-height: 300px; overflow-y: scroll; }
+        #input { display: flex; margin-top: 10px; }
+        #chat-input { flex: 1; padding: 5px; }
+        #send-button { padding: 5px; }
+    </style>
 </head>
 <body>
-    <div id="chat-container">
-        <div id="messages"></div>
-        <div id="input-container">
-            <input type="text" id="chat-input" placeholder="여기에 메세지 입력...">
-            <button id="send-button">보내기</button>
-        </div>
+    <div id="messages"></div>
+    <div id="input">
+        <input id="chat-input" type="text" placeholder="Type your message">
+        <button id="send-button">Send</button>
     </div>
-    <script src="script.js"></script>
+
+    <script>
+        const socket = io();
+
+        const messages = document.getElementById("messages");
+        const chatInput = document.getElementById("chat-input");
+        const sendButton = document.getElementById("send-button");
+
+        sendButton.addEventListener("click", () => {
+            const msg = chatInput.value.trim();
+            if (msg) {
+                socket.emit("chat message", msg);
+                chatInput.value = '';
+            }
+        });
+
+        socket.on("chat message", (msg) => {
+            const messageDiv = document.createElement("div");
+            messageDiv.textContent = msg;
+            messages.appendChild(messageDiv);
+        });
+    </script>
 </body>
 </html>
